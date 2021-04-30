@@ -105,10 +105,10 @@ function loadPage() {
 
   const yAxisScale = d3
     .scaleLinear()
-    .domain([startTime, endTime])
+    .domain([new Date(startTime), new Date(endTime)])
     .range([0, h]);
 
-  const yAxis = d3.axisRight(yAxisScale);
+  const yAxis = d3.axisRight(yAxisScale).tickFormat(timeFormat);
 
   svg
     .append('div')
