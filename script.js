@@ -12,6 +12,8 @@ let w = 500,
   rangeOfTime;
 
 const timeFormat = d3.timeFormat('%M:%S');
+const keys = ['No doping allegations', 'Riders with doping allegations'];
+const size = 20;
 
 async function getData() {
   const data = await fetch(
@@ -67,6 +69,38 @@ function loadPage() {
     .attr('width', w)
     .attr('height', h)
     .attr('id', 'title');
+
+  svg
+    .selectAll('mydots')
+    .data(keys)
+    .enter()
+    .append('rect')
+    .attr('x', 100)
+    .attr('y', (d, i) => {
+      return 100 + i * (size + 5);
+    })
+    .attr('width', size)
+    .attr('height', size)
+    .style('fill', () => 'red');
+
+  svg
+    .selectAll('mylabels')
+    .data(keys)
+    .enter()
+    .append('text')
+    .attr('id', 'legend')
+    .attr('x', 100 + size * 1.2)
+    .attr('y', function (d, i) {
+      return 100 + i * (size + 5) + size / 2;
+    }) // 100 is where the first dot appears. 25 is the distance between dots
+    .style('fill', function (d) {
+      return 'red';
+    })
+    .text(function (d) {
+      return d;
+    })
+    .attr('text-anchor', 'left')
+    .style('alignment-baseline', 'middle');
 
   const xAxisScale = d3
     .scaleTime()
