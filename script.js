@@ -104,8 +104,8 @@ function loadPage() {
     .call(xAxis);
 
   const yAxisScale = d3
-    .scaleLinear()
-    .domain([new Date(startTime), new Date(endTime)])
+    .scaleTime()
+    .domain([new Date(startTime).getTime(), new Date(endTime).getTime()])
     .range([0, h]);
 
   const yAxis = d3.axisRight(yAxisScale).tickFormat(timeFormat);
@@ -136,12 +136,7 @@ function loadPage() {
       return d['Year'];
     })
     .attr('data-yvalue', (d, i) => {
-      const [min, sec] = d['Time'].split(':');
-      const d1 = new Date(null),
-        d2 = new Date(d1);
-      d2.setMinutes(d1.getMinutes() + min);
-      d2.setSeconds(d2.getSeconds() + sec);
-      return d2;
+      return getDateFromTime(d['Time']);
     })
 
     .attr('cx', function (d) {
@@ -172,4 +167,13 @@ function loadPage() {
         .style('visibility', 'hidden')
         .attr('data-date', null);
     });
+}
+
+function getDateFromTime(time) {
+  const [min, sec] = time;
+  const d1 = new Date(null),
+    d2 = new Date(d1);
+  d2.setMinutes(d1.getMinutes() + min);
+  d2.setSeconds(d2.getSeconds() + sec);
+  return d2;
 }
