@@ -1,11 +1,12 @@
 let dataset = [];
 const padding = 60;
-let w = 500 - padding,
-  h = 500 - padding,
+let w = 500,
+  h = 500,
   xScale = 1,
   yScale = 1,
   startDate = 10000,
-  endDate = 0;
+  endDate = 0,
+  rangeOfYears;
 
 async function getData() {
   const data = await fetch(
@@ -17,12 +18,11 @@ async function getData() {
     startDate = Math.min(startDate, element['Year']);
     endDate = Math.max(endDate, element['Year']);
   });
-  console.log(startDate, endDate);
-  console.log(new Date(startDate + ''));
+  rangeOfYears = endDate - startDate;
   const n = dataset.length;
   // startDate = dataset[0][0];
   // endDate = dataset[n - 1][0];
-  xScale = w / dataset.length;
+  yScale = h / (endDate - startDate);
 
   loadPage();
 }
@@ -42,17 +42,28 @@ function loadPage() {
     .data(dataset)
     .enter()
     .append('circle')
+    .attr('data-xvalue', (d, i) => {
+      return d['Year'];
+    })
+    .attr('data-yvalue', (d, i) => {
+      console.log(d);
+      return new Date(d['Time']);
+    })
 
-    .attr('cx', function (d) {
-      // console.log(d);
-      return d['Year'] * xScale;
+    .attr('cx', function (d, i) {
+      console.log(d, i);
+      const num = (endDate - d['Year']) * yScale;
+      // debugger;
+      console.log(num);
+
+      return num;
     })
     .attr('cy', function (d) {
-      return 10;
+      return 20;
     })
     .attr('r', 1.5)
     .style('fill', '#69b3a2')
-    .attr('width', xScale)
+    .attr('width', 20)
     .attr('height', 20);
   // .attr('class', 'bar')
   // .style('opacity', 0.5)
@@ -68,15 +79,15 @@ function loadPage() {
   // .attr('width', xScale)
   // .attr('height', (d, i) => d[1] * yScale);
 
-  const yAxisScale = d3
+  const xAxisScale = d3
     .scaleTime()
     .domain([new Date(startDate + ''), new Date(endDate + '')])
     .range([0, h]);
 
-  const yAxis = d3.axisLeft().scale(yAxisScale);
+  const xAxis = d3.axisBottom().scale(xAxisScale);
   svg
     .append('g')
-    .attr('id', 'y-axis')
-    .attr('transform', `translate(${padding}, 0)`)
-    .call(yAxis);
+    .attr('id', 'x-axis')
+    .attr('transform', `translate(${0}, 0)`)
+    .call(xAxis);
 }
