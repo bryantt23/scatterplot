@@ -23,32 +23,18 @@ async function getData() {
     'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/cyclist-data.json'
   );
   dataset = await data.json();
-  // console.log(dataset);
+
   dataset.forEach(element => {
     startDate = Math.min(startDate, element['Year']);
     endDate = Math.max(endDate, element['Year']);
-    // const [hr, min] = element['Time'].split(':');
-    // console.log(hr, min);
-    // console.log(element['Seconds']);
-    // const date = new Date(null);
-    // console.log(date);
-    // date.setHours(hr);
-    // date.setMinutes(min);
-
     startTime = Math.min(startTime, element['Seconds']);
     endTime = Math.max(endTime, element['Seconds']);
   });
   rangeOfYears = endDate - startDate;
   rangeOfTime = endTime - startTime;
-  const n = dataset.length;
-  // startDate = dataset[0][0];
-  // endDate = dataset[n - 1][0];
+
   yScale = h / rangeOfTime;
-  console.log('yScale', yScale);
   xScale = w / rangeOfYears;
-  // console.log(new Date(startTime).getMinutes());
-  // console.log(new Date(endTime));
-  console.log(startTime, endTime);
 
   loadPage();
 }
@@ -158,18 +144,11 @@ function loadPage() {
       return d2;
     })
 
-    .attr('cx', function (d, i) {
-      // console.log(d, i);
+    .attr('cx', function (d) {
       const num = (d['Year'] - startDate) * xScale;
-      // debugger;
-      // console.log(num);
-
       return num;
     })
-    .attr('cy', function (d) {
-      // console.log(d);
-      // console.log(h - d['Seconds'] * yScale);
-      // console.log((d['Seconds'] - startTime) * yScale);
+    .attr('cy', function (d, i) {
       const num = (h - (endTime - d['Seconds'])) * yScale;
       // console.log(num);
       return yAxisScale(d['Seconds']);
@@ -177,10 +156,8 @@ function loadPage() {
     .attr('r', 5)
     .style('fill', '#69b3a2')
     .on('mouseover', (d, i) => {
-      console.log(i);
       const x = d.clientX,
         y = d.clientY;
-      console.log(x, y);
 
       d3.select('#tooltip')
         .style('top', y - 10 + 'px')
