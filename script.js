@@ -15,7 +15,7 @@ async function getData() {
     'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/cyclist-data.json'
   );
   dataset = await data.json();
-  console.log(dataset);
+  // console.log(dataset);
   dataset.forEach(element => {
     startDate = Math.min(startDate, element['Year']);
     endDate = Math.max(endDate, element['Year']);
@@ -35,6 +35,7 @@ async function getData() {
   // startDate = dataset[0][0];
   // endDate = dataset[n - 1][0];
   yScale = h / endTime;
+  console.log('yScale', yScale);
   xScale = w / rangeOfYears;
   // console.log(new Date(startTime).getMinutes());
   // console.log(new Date(endTime));
@@ -66,34 +67,37 @@ function loadPage() {
       // console.log(d);
       // console.log(typeof d['Time']);
       // console.log(new Date(d['Time']));
-      const [hr, min] = d['Time'].split(':');
+      const [min, sec] = d['Time'].split(':');
       // console.log(hr, min);
-      var date = new Date(null);
-      date.setHours(hr);
-      date.setMinutes(min);
+
+      const d1 = new Date(null),
+        d2 = new Date(d1);
+      d2.setMinutes(d1.getMinutes() + min);
+      d2.setSeconds(d2.getSeconds() + sec);
+      // alert(dsec);
 
       // return new Date(Number(d['Time']));
-      return date;
+      return d2;
     })
 
     .attr('cx', function (d, i) {
-      console.log(d, i);
+      // console.log(d, i);
       const num = (d['Year'] - startDate) * xScale;
       // debugger;
-      console.log(num);
+      // console.log(num);
 
       return num;
     })
     .attr('cy', function (d) {
       // console.log(d['Seconds']);
-      const num = h - d['Seconds'] * yScale;
-      // console.log(num);
-      return num;
+      const num = (endTime - d['Seconds']) * yScale;
+      console.log(num);
+      return '500';
     })
-    .attr('r', 1.5)
-    .style('fill', '#69b3a2')
-    .attr('width', 20)
-    .attr('height', 20);
+    .attr('r', 5)
+    .style('fill', '#69b3a2');
+  // .attr('width', 200)
+  // .attr('height', 200);
   // .attr('class', 'bar')
   // .style('opacity', 0.5)
   // .attr('x', (d, i) => {
