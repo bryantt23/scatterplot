@@ -8,7 +8,10 @@ let w = 500,
   endDate = 0,
   startTime = new Date(),
   endTime = new Date(null),
-  rangeOfYears;
+  rangeOfYears,
+  rangeOfTime;
+
+const timeFormat = d3.timeFormat('%M:%S');
 
 async function getData() {
   const data = await fetch(
@@ -31,10 +34,11 @@ async function getData() {
     endTime = Math.max(endTime, element['Seconds']);
   });
   rangeOfYears = endDate - startDate;
+  rangeOfTime = endTime - startTime;
   const n = dataset.length;
   // startDate = dataset[0][0];
   // endDate = dataset[n - 1][0];
-  yScale = h / endTime;
+  yScale = h / rangeOfTime;
   console.log('yScale', yScale);
   xScale = w / rangeOfYears;
   // console.log(new Date(startTime).getMinutes());
@@ -54,6 +58,31 @@ function loadPage() {
     .attr('height', h)
     .attr('id', 'title');
 
+  const xAxisScale = d3
+    .scaleTime()
+    .domain([new Date(startDate + ''), new Date(endDate + '')])
+    .range([0, w]);
+
+  const xAxis = d3.axisBottom().scale(xAxisScale);
+  svg
+    .append('g')
+    .attr('id', 'x-axis')
+    .attr('transform', `translate(${0}, 0)`)
+    .call(xAxis);
+
+  const yAxisScale = d3
+    .scaleLinear()
+    .domain([startTime, endTime])
+    .range([0, h]);
+
+  const yAxis = d3.axisRight(yAxisScale);
+
+  svg
+    .append('g')
+    .attr('id', 'y-axis')
+    .attr('transform', `translate(0, 0)`)
+    .call(yAxis);
+
   svg
     .selectAll('dot')
     .data(dataset)
@@ -64,19 +93,11 @@ function loadPage() {
       return d['Year'];
     })
     .attr('data-yvalue', (d, i) => {
-      // console.log(d);
-      // console.log(typeof d['Time']);
-      // console.log(new Date(d['Time']));
       const [min, sec] = d['Time'].split(':');
-      // console.log(hr, min);
-
       const d1 = new Date(null),
         d2 = new Date(d1);
       d2.setMinutes(d1.getMinutes() + min);
       d2.setSeconds(d2.getSeconds() + sec);
-      // alert(dsec);
-
-      // return new Date(Number(d['Time']));
       return d2;
     })
 
@@ -89,10 +110,12 @@ function loadPage() {
       return num;
     })
     .attr('cy', function (d) {
-      // console.log(d['Seconds']);
-      const num = (endTime - d['Seconds']) * yScale;
+      // console.log(d);
+      // console.log(h - d['Seconds'] * yScale);
+      // console.log((d['Seconds'] - startTime) * yScale);
+      const num = (h - (endTime - d['Seconds'])) * yScale;
       console.log(num);
-      return '500';
+      return yAxisScale(d['Seconds']);
     })
     .attr('r', 5)
     .style('fill', '#69b3a2');
@@ -111,28 +134,4 @@ function loadPage() {
   // })
   // .attr('width', xScale)
   // .attr('height', (d, i) => d[1] * yScale);
-
-  const xAxisScale = d3
-    .scaleTime()
-    .domain([new Date(startDate + ''), new Date(endDate + '')])
-    .range([0, w]);
-
-  const xAxis = d3.axisBottom().scale(xAxisScale);
-  svg
-    .append('g')
-    .attr('id', 'x-axis')
-    .attr('transform', `translate(${0}, 0)`)
-    .call(xAxis);
-
-  const yAxisScale = d3
-    .scaleLinear()
-    .domain([startTime, endTime])
-    .range([h, 0]);
-
-  const yAxis = d3.axisLeft().scale(yAxisScale);
-  svg
-    .append('g')
-    .attr('id', 'y-axis')
-    .attr('transform', `translate(${w}, 0)`)
-    .call(yAxis);
 }
