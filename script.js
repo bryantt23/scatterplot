@@ -6,6 +6,8 @@ let w = 500,
   yScale = 1,
   startDate = 10000,
   endDate = 0,
+  startTime = new Date(),
+  endTime = new Date(null),
   rangeOfYears;
 
 async function getData() {
@@ -17,12 +19,26 @@ async function getData() {
   dataset.forEach(element => {
     startDate = Math.min(startDate, element['Year']);
     endDate = Math.max(endDate, element['Year']);
+    // const [hr, min] = element['Time'].split(':');
+    // console.log(hr, min);
+    // console.log(element['Seconds']);
+    // const date = new Date(null);
+    // console.log(date);
+    // date.setHours(hr);
+    // date.setMinutes(min);
+
+    startTime = Math.min(startTime, element['Seconds']);
+    endTime = Math.max(endTime, element['Seconds']);
   });
   rangeOfYears = endDate - startDate;
   const n = dataset.length;
   // startDate = dataset[0][0];
   // endDate = dataset[n - 1][0];
-  yScale = h / (endDate - startDate);
+  yScale = h / endTime;
+  xScale = w / rangeOfYears;
+  // console.log(new Date(startTime).getMinutes());
+  // console.log(new Date(endTime));
+  console.log(startTime, endTime);
 
   loadPage();
 }
@@ -47,20 +63,32 @@ function loadPage() {
       return d['Year'];
     })
     .attr('data-yvalue', (d, i) => {
-      console.log(d);
-      return new Date(d['Time']);
+      // console.log(d);
+      // console.log(typeof d['Time']);
+      // console.log(new Date(d['Time']));
+      const [hr, min] = d['Time'].split(':');
+      // console.log(hr, min);
+      var date = new Date(null);
+      date.setHours(hr);
+      date.setMinutes(min);
+
+      // return new Date(Number(d['Time']));
+      return date;
     })
 
     .attr('cx', function (d, i) {
       console.log(d, i);
-      const num = (endDate - d['Year']) * yScale;
+      const num = (d['Year'] - startDate) * xScale;
       // debugger;
       console.log(num);
 
       return num;
     })
     .attr('cy', function (d) {
-      return 20;
+      // console.log(d['Seconds']);
+      const num = h - d['Seconds'] * yScale;
+      // console.log(num);
+      return num;
     })
     .attr('r', 1.5)
     .style('fill', '#69b3a2')
@@ -83,7 +111,7 @@ function loadPage() {
   const xAxisScale = d3
     .scaleTime()
     .domain([new Date(startDate + ''), new Date(endDate + '')])
-    .range([0, h]);
+    .range([0, w]);
 
   const xAxis = d3.axisBottom().scale(xAxisScale);
   svg
@@ -91,4 +119,16 @@ function loadPage() {
     .attr('id', 'x-axis')
     .attr('transform', `translate(${0}, 0)`)
     .call(xAxis);
+
+  const yAxisScale = d3
+    .scaleLinear()
+    .domain([startTime, endTime])
+    .range([h, 0]);
+
+  const yAxis = d3.axisLeft().scale(yAxisScale);
+  svg
+    .append('g')
+    .attr('id', 'y-axis')
+    .attr('transform', `translate(${w}, 0)`)
+    .call(yAxis);
 }
