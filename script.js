@@ -15,6 +15,9 @@ const timeFormat = d3.timeFormat('%M:%S');
 const keys = ['No doping allegations', 'Riders with doping allegations'];
 const size = 20;
 
+// Usually you have a color scale in your chart already
+const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet1);
+
 async function getData() {
   const data = await fetch(
     'https://raw.githubusercontent.com/freeCodeCamp/ProjectReferenceData/master/cyclist-data.json'
@@ -81,7 +84,7 @@ function loadPage() {
     })
     .attr('width', size)
     .attr('height', size)
-    .style('fill', () => 'red');
+    .style('fill', d => color(d));
 
   svg
     .selectAll('mylabels')
@@ -94,7 +97,7 @@ function loadPage() {
       return 100 + i * (size + 5) + size / 2;
     }) // 100 is where the first dot appears. 25 is the distance between dots
     .style('fill', function (d) {
-      return 'red';
+      return color(d);
     })
     .text(function (d) {
       return d;
