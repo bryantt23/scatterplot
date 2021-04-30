@@ -42,6 +42,7 @@ function loadPage() {
     .data(dataset)
     .enter()
     .append('circle')
+    .attr('class', 'dot')
     .attr('data-xvalue', (d, i) => {
       return d['Year'];
     })
