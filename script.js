@@ -51,6 +51,16 @@ async function getData() {
 getData();
 
 function loadPage() {
+  d3.select('body')
+    .append('div')
+    .attr('id', 'tooltip')
+    .attr('style', 'position:absolute; visibility:hidden')
+    .attr('width', w)
+    .attr('height', h)
+    .on('mousemove', () => {
+      d3.select('#tooltip');
+    });
+
   const svg = d3
     .select('body')
     .append('svg')
@@ -76,6 +86,16 @@ function loadPage() {
     .range([0, h]);
 
   const yAxis = d3.axisRight(yAxisScale);
+
+  svg
+    .append('div')
+    .attr('id', 'tooltip')
+    .attr('style', 'position: absolute; visibilty:hidden')
+    .attr('width', w)
+    .attr('height', h)
+    .on('mousemove', () => {
+      d3.select('#tooltip');
+    });
 
   svg
     .append('g')
@@ -114,24 +134,28 @@ function loadPage() {
       // console.log(h - d['Seconds'] * yScale);
       // console.log((d['Seconds'] - startTime) * yScale);
       const num = (h - (endTime - d['Seconds'])) * yScale;
-      console.log(num);
+      // console.log(num);
       return yAxisScale(d['Seconds']);
     })
     .attr('r', 5)
-    .style('fill', '#69b3a2');
-  // .attr('width', 200)
-  // .attr('height', 200);
-  // .attr('class', 'bar')
-  // .style('opacity', 0.5)
-  // .attr('x', (d, i) => {
-  //   console.log(d);
-  //   return 5;
-  //   // return i * xScale;
-  // })
-  // .attr('y', (d, i) => {
-  //   return h - 10;
-  //   // return h - d[1] * yScale;
-  // })
-  // .attr('width', xScale)
-  // .attr('height', (d, i) => d[1] * yScale);
+    .style('fill', '#69b3a2')
+    .on('mouseover', (d, i) => {
+      console.log(i);
+      const x = d.clientX,
+        y = d.clientY;
+      console.log(x, y);
+
+      d3.select('#tooltip')
+        .style('top', y - 10 + 'px')
+        .style('left', x + 'px')
+        .style('visibility', 'visible')
+        .style('background-color', 'yellow')
+        .attr('data-year', `${i['Year']}`)
+        .text(`1234`);
+    })
+    .on('mouseout', () => {
+      d3.select('#tooltip')
+        .style('visibility', 'hidden')
+        .attr('data-date', null);
+    });
 }
