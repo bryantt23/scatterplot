@@ -15,8 +15,7 @@ const timeFormat = d3.timeFormat('%M:%S');
 const keys = ['No doping allegations', 'Riders with doping allegations'];
 const size = 20;
 
-// Usually you have a color scale in your chart already
-const color = d3.scaleOrdinal().domain(keys).range(d3.schemeSet1);
+const color = d3.scaleOrdinal().domain(keys).range(['green', 'red']);
 
 async function getData() {
   const data = await fetch(
@@ -144,7 +143,6 @@ function loadPage() {
     .attr('data-yvalue', (d, i) => {
       return d.Seconds;
     })
-
     .attr('cx', function (d) {
       const num = (d['Year'] - startDate) * xScale;
       return num;
@@ -153,7 +151,12 @@ function loadPage() {
       return yAxisScale(d.Seconds);
     })
     .attr('r', 5)
-    .style('fill', '#69b3a2')
+    .style('fill', (d, i) => {
+      if (d.Doping.length === 0) {
+        return 'green';
+      }
+      return 'red';
+    })
     .on('mouseover', (d, i) => {
       const x = d.clientX,
         y = d.clientY;
