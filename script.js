@@ -150,7 +150,6 @@ function loadPage() {
       return num;
     })
     .attr('cy', function (d, i) {
-      // console.log(num);
       return yAxisScale(d.Seconds);
     })
     .attr('r', 5)
@@ -159,13 +158,17 @@ function loadPage() {
       const x = d.clientX,
         y = d.clientY;
 
-      d3.select('#tooltip')
+      d3
+        .select('#tooltip')
         .style('top', y - 10 + 'px')
         .style('left', x + 'px')
         .style('visibility', 'visible')
         .style('background-color', 'yellow')
-        .attr('data-year', `${i['Year']}`)
-        .text(`1234`);
+        .attr('data-year', `${i['Year']}`).html(`        
+        ${i.Name}: ${i.Nationality} </br>
+        Year: ${i.Year}, Time: ${i.Time}</br>
+        ${i.Doping}
+      `);
     })
     .on('mouseout', () => {
       d3.select('#tooltip')
