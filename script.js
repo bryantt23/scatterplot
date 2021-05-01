@@ -24,6 +24,12 @@ async function getData() {
   );
   dataset = await data.json();
 
+  //convert seconds to date
+  dataset = dataset.map(d => {
+    d.Seconds = new Date(d.Seconds * 1000);
+    return d;
+  });
+
   dataset.forEach(element => {
     startDate = Math.min(startDate, element['Year']);
     endDate = Math.max(endDate, element['Year']);
@@ -33,7 +39,7 @@ async function getData() {
   rangeOfYears = endDate - startDate;
   rangeOfTime = endTime - startTime;
 
-  yScale = h / rangeOfTime;
+  // yScale = d3.scaleTime();
   xScale = w / rangeOfYears;
 
   loadPage();
@@ -105,7 +111,7 @@ function loadPage() {
 
   const yAxisScale = d3
     .scaleTime()
-    .domain([new Date(startTime).getTime(), new Date(endTime).getTime()])
+    .domain(d3.extent(dataset, d => d.Seconds))
     .range([0, h]);
 
   const yAxis = d3.axisRight(yAxisScale).tickFormat(timeFormat);
@@ -136,7 +142,7 @@ function loadPage() {
       return d['Year'];
     })
     .attr('data-yvalue', (d, i) => {
-      return getDateFromTime(d['Time']);
+      return d.Seconds;
     })
 
     .attr('cx', function (d) {
@@ -144,9 +150,8 @@ function loadPage() {
       return num;
     })
     .attr('cy', function (d, i) {
-      const num = (h - (endTime - d['Seconds'])) * yScale;
       // console.log(num);
-      return yAxisScale(d['Seconds']);
+      return yAxisScale(d.Seconds);
     })
     .attr('r', 5)
     .style('fill', '#69b3a2')
