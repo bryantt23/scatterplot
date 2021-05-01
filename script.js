@@ -102,11 +102,11 @@ function loadPage() {
     .domain([new Date(startDate + ''), new Date(endDate + '')])
     .range([0, w]);
 
-  const xAxis = d3.axisBottom().scale(xAxisScale);
+  const xAxis = d3.axisTop().scale(xAxisScale);
   svg
     .append('g')
     .attr('id', 'x-axis')
-    .attr('transform', `translate(${0}, 0)`)
+    .attr('transform', `translate(0, ${h})`)
     .call(xAxis);
 
   const yAxisScale = d3
